@@ -1,28 +1,28 @@
-//#include <iostream> //already included in blockCchian class
-#include "BlockChain.h"
-#include "Transaction.h"
-// #include "includes/RSA.h" //already Included in Transaction Class
+#include <iostream>
+
+#include "block_chain.hpp"
+#include "transaction.hpp"
 
 int main()
 {
-  ra::RSAKeyPair k1("127.0.0.1:80");
-  ra::RSAKeyPair k2("189.0.2.47:52");
+  ra::rsa_key_pair k1("127.0.0.1:80");
+  ra::rsa_key_pair k2("189.0.2.47:52");
 
-  ra::BlockChain<ra::Transaction,std::hash<std::string> > raCoin(5,50); //5,6,7 works best
-  //ra::BlockChain<ra::Transaction,std::hash<std::string> > raCoin(6); //5,6,7 works best
+  ra::block_chain<ra::transaction, std::hash<std::string>> ra_coin(MED_DIFFICULTY, 50);
+  // ra::block_chain<ra::Transaction,std::hash<std::string> > ra_coin(MAX_DIFFICULTY);
 
-  ra::Transaction t1(k1.getPublicKey(),k2.getPublicKey(),50);
-  t1.signTransaction(k1); 
-  raCoin.addTransaction(t1);
+  ra::transaction t1(k1.get_public_key(), k2.get_public_key(), 50);
+  t1.sign_transaction(k1);
+  ra_coin.add_transaction(t1);
 
-  raCoin.minePendingTransactions(k2.getPublicKey());
+  ra_coin.mine_poending_transactions(k2.get_public_key());
 
-  for(ra::BlockChain<ra::Transaction,std::hash<std::string>>::iterator abc = raCoin.begin();abc!=raCoin.end();abc++)
+  for (ra::block_chain<ra::transaction, std::hash<std::string>>::iterator abc = ra_coin.begin(); abc != ra_coin.end(); abc++)
   {
-    std::cout<<*abc;
+    std::cout << *abc;
   }
-  std::cout<<"\n\nIs Chain Valid: "<<raCoin.isChainValid();
+  std::cout << "\n\nIs Chain Valid: " << ra_coin.is_chain_valid();
 
-  std::cout<<"\n\n k2 balance : "<<raCoin.getBalance(k2.getPublicKey());
+  std::cout << "\n\nk2 balance : " << ra_coin.get_balance(k2.get_public_key());
   return 0;
 }
