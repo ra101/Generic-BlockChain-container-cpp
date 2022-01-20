@@ -2,26 +2,26 @@
 // #include <chrono>    //already add to block_chain
 #include "includes/rsa.hpp"
 
-#define KEY_CLASS rsa_key_pair //we can use template as well
+#define KEY_CLASS rsa_key_pair // we can use template as well
 
 namespace ra
 {
     class transaction
     {
     private:
-        unsigned long long int from_address; //your public key
-        unsigned long long int to_address;   //ohers public key
+        unsigned long long int from_address; // your public key
+        unsigned long long int to_address;   // ohers public key
         float transfer_amount;
         std::chrono::steady_clock::time_point timestamp;
         std::size_t signature;
 
     public:
         transaction(const unsigned long long int from_address, const unsigned long long int to_address, const float &transfer_amount);
-        std::string generate_hash_input();                                    //converts to string and concatenates them
-        friend std::ostream &operator<<(std::ostream &, transaction const &); //to print transacttion
-        float get_balance(const unsigned long long int);                      //makes sense for multiple transactions
-        bool sign_transaction(KEY_CLASS key_pair);                            //hash of input happen during signing
-        bool is_transaction_valid();                                          //uses verify of rsa
+        std::string generate_hash_input();                                    // converts to string and concatenates them
+        friend std::ostream &operator<<(std::ostream &, transaction const &); // to print transacttion
+        float get_balance(const unsigned long long int);                      // makes sense for multiple transactions
+        bool sign_transaction(KEY_CLASS key_pair);                            // hash of input happen during signing
+        bool is_transaction_valid();                                          // uses verify of rsa
     };
 
     transaction::transaction(const unsigned long long int from_address, const unsigned long long int to_address, const float &transfer_amount)
@@ -68,7 +68,7 @@ namespace ra
             exit(0);
         }
 
-        //already signed
+        // already signed
         if (signature != 0)
             return false;
 
@@ -78,11 +78,11 @@ namespace ra
 
     bool transaction::is_transaction_valid()
     {
-        //reward
+        // reward
         if (from_address == 0)
             return true;
 
-        //unsigned and not reward
+        // unsigned and not reward
         if (signature == 0)
             return false;
 

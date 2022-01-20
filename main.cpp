@@ -15,7 +15,7 @@ int main()
   t1.sign_transaction(k1);
   ra_coin.add_transaction(t1);
 
-  ra_coin.mine_poending_transactions(k2.get_public_key());
+  ra_coin.mine_pending_transactions(k2.get_public_key());
 
   for (ra::block_chain<ra::transaction, std::hash<std::string>>::iterator abc = ra_coin.begin(); abc != ra_coin.end(); abc++)
   {

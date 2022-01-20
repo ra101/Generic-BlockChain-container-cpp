@@ -56,7 +56,7 @@ namespace ra
             return true;
         }
 
-        void mine_poending_transactions(unsigned long long int minning_reward_address)
+        void mine_pending_transactions(unsigned long long int minning_reward_address)
         {
             if (reward_flag)
             {
@@ -68,7 +68,7 @@ namespace ra
             pending_transaction.clear();
         }
 
-        void mine_poending_transactions()
+        void mine_pending_transactions()
         {
             block<Transaction, HashFunctionClass> new_block((chain.back().get_hash()), difficulty, pending_transaction, chain.size());
             chain.push_back(new_block);
