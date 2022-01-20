@@ -8,7 +8,7 @@ namespace ra
 {
 
     // HashFunctionClass has no funtionality in this header, but it has to be passed into block constructor
-    template <class Transaction, class HashFunctionClass>
+    template <class Transaction, class HashFunctionClass, typename Message>
     class block_chain
     {
     private:
@@ -20,11 +20,15 @@ namespace ra
         // It exists for a non reward based block_chain
         bool reward_flag;
 
+        // Transaction will use this verfication function
+        bool (*verfication_function)(Message, std::size_t, unsigned long long int);
+
     public:
-        block_chain(int difficulty, float minning_reward)
+        block_chain(int difficulty, float minning_reward, bool (*verfication_function)(Message, std::size_t, unsigned long long int))
         {
             this->difficulty = difficulty;
             this->minning_reward = minning_reward;
+            this->verfication_function = verfication_function;
             chain.push_back(*(new block<Transaction, HashFunctionClass>(0, difficulty, pending_transaction, chain.size())));
             reward_flag = true;
         }
@@ -48,7 +52,7 @@ namespace ra
                         return false;
 
                 // All sinature are valid?
-                if (!((*current_block).is_block_valid()))
+                if (!((*current_block).is_block_valid(verfication_function)))
                     return false;
 
                 previous_block = current_block;
@@ -80,7 +84,7 @@ namespace ra
         void add_transaction(Transaction &temp)
         {
             // Signed?
-            if (!temp.is_transaction_valid())
+            if (!temp.is_transaction_valid(verfication_function))
             {
                 std::cout << "Invalid Transaction";
                 exit(0);

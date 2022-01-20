@@ -90,11 +90,13 @@ namespace ra
             hash_input += std::to_string(nonce);
             return (hash == hash_function(hash_input));
         }
-        bool is_block_valid()
+
+        template <typename Message>
+        bool is_block_valid(bool (*verfication_function)(Message, std::size_t, unsigned long long int))
         {
 
             for (typename std::list<Transaction>::iterator trans_elem = transaction_list.begin(); trans_elem != transaction_list.end(); trans_elem++)
-                if (!((*trans_elem).is_transaction_valid()))
+                if (!((*trans_elem).is_transaction_valid(verfication_function)))
                     return false;
             return true;
         }
