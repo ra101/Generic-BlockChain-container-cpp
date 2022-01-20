@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-std=c++11
+CXXFLAGS=-std=c++11 -w
 
 build: main.cpp block_chain.hpp block.hpp transaction.hpp includes/rsa.hpp includes/prime.hpp
 	@echo "\n\nBuilding..."
