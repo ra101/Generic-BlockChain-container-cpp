@@ -1,4 +1,6 @@
+#include <iostream>
 #include <chrono>
+#include <set>
 
 #define MIN_DIFFICULTY 1
 #define MED_DIFFICULTY 3
@@ -25,7 +27,7 @@ namespace ra
         int nonce;
 
         // pending transactin will become tranctionlist here
-        std::list<Transaction> transaction_list;
+        std::set<Transaction> transaction_set;
 
         // for proof of work
         long long int find_hash_length(int difficulty)
@@ -44,20 +46,20 @@ namespace ra
         std::string generate_hash_input()
         {
             std::string hash_input = std::to_string((std::chrono::duration_cast<std::chrono::microseconds>(timestamp.time_since_epoch()).count()));
-            for (typename std::list<Transaction>::iterator trans_elem = transaction_list.begin(); trans_elem != transaction_list.end(); trans_elem++)
+            for (typename std::set<Transaction>::iterator trans_elem = transaction_set.begin(); trans_elem != transaction_set.end(); trans_elem++)
             {
-                hash_input += (*trans_elem).generate_hash_input();
+                hash_input += trans_elem->generate_hash_input();
             }
             hash_input += std::to_string(previous_hash);
             return hash_input;
         }
 
     public:
-        block(std::size_t previous_hash, int difficulty, std::list<Transaction> transaction_list, int id)
+        block(std::size_t previous_hash, int difficulty, std::set<Transaction> transaction_set, int id)
         {
             this->id = id;
             this->previous_hash = previous_hash;
-            this->transaction_list = transaction_list;
+            this->transaction_set = transaction_set;
             difficulty = std::max(std::min(difficulty, MAX_DIFFICULTY), MIN_DIFFICULTY);
             nonce = 0;
             timestamp = std::chrono::steady_clock::now();
@@ -95,7 +97,7 @@ namespace ra
         bool is_block_valid(bool (*verfication_function)(Message, std::size_t, unsigned long long int))
         {
 
-            for (typename std::list<Transaction>::iterator trans_elem = transaction_list.begin(); trans_elem != transaction_list.end(); trans_elem++)
+            for (typename std::set<Transaction>::iterator trans_elem = transaction_set.begin(); trans_elem != transaction_set.end(); trans_elem++)
                 if (!((*trans_elem).is_transaction_valid(verfication_function)))
                     return false;
             return true;
@@ -105,7 +107,7 @@ namespace ra
         float get_balance(const unsigned long long int address)
         {
             float balance = 0;
-            for (typename std::list<Transaction>::iterator trans_elem = transaction_list.begin(); trans_elem != transaction_list.end(); trans_elem++)
+            for (typename std::set<Transaction>::iterator trans_elem = transaction_set.begin(); trans_elem != transaction_set.end(); trans_elem++)
                 balance += (*trans_elem).get_balance(address);
             return balance;
         }
@@ -119,8 +121,8 @@ namespace ra
             else
                 out << "\n\n...\nBlock No. " << temp.id;
 
-            out << "\n\nNo of Entries: " << temp.transaction_list.size() << "\nHash: " << temp.hash << "\nPrevious Hash: " << temp.previous_hash;
-            for (typename std::list<Transaction>::const_iterator trans_elem = (temp.transaction_list).begin(); trans_elem != temp.transaction_list.end(); trans_elem++, i++)
+            out << "\n\nNo of Entries: " << temp.transaction_set.size() << "\nHash: " << temp.hash << "\nPrevious Hash: " << temp.previous_hash;
+            for (typename std::set<Transaction>::const_iterator trans_elem = (temp.transaction_set).begin(); trans_elem != temp.transaction_set.end(); trans_elem++, i++)
                 out << "\n\nEntry no: " << i << (*trans_elem);
 
             return out;

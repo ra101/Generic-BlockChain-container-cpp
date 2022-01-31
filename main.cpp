@@ -24,13 +24,16 @@ public:
     signature = 0;
   }
 
-  std::string generate_hash_input()
+  std::string generate_hash_input() const
   {
     std::string hash_input = std::to_string((std::chrono::duration_cast<std::chrono::microseconds>(this->timestamp.time_since_epoch()).count()));
     hash_input += std::to_string(this->from_address) + std::to_string(this->to_address) + std::to_string(this->transfer_amount);
     return hash_input;
   }
-
+  bool operator<(const custom_transaction &other) const
+  {
+    return generate_hash_input() < other.generate_hash_input();
+  }
   friend std::ostream &operator<<(std::ostream &out, custom_transaction const &temp)
   {
     out << "\nfrom_address: " << temp.from_address;
@@ -40,7 +43,7 @@ public:
     return out;
   }
 
-  float get_balance(unsigned long long int address)
+  float get_balance(unsigned long long int address) const
   {
     if (address == this->to_address)
       return transfer_amount;
@@ -69,7 +72,7 @@ public:
   }
 
   template <typename Message> // makes sense for multiple transactions
-  bool is_transaction_valid(bool (*verfication_function)(Message, std::size_t, unsigned long long int))
+  bool is_transaction_valid(bool (*verfication_function)(Message, std::size_t, unsigned long long int)) const
   {
     // reward
     if (from_address == 0)

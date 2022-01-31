@@ -1,5 +1,6 @@
 #include <iostream>
 #include <list>
+#include <set>
 
 #include "block.hpp"
 // Each class is independed of other there exits no herachy yet data can't be manipulated due to checks
@@ -15,7 +16,7 @@ namespace ra
         using block_type = block<Transaction, HashFunctionClass>;
 
         std::list<block_type> chain;
-        std::list<Transaction> pending_transaction;
+        std::set<Transaction> pending_transaction;
 
         int difficulty;
         float minning_reward;
@@ -68,7 +69,7 @@ namespace ra
             if (reward_flag)
             {
                 Transaction reward_transaction(0, minning_reward_address, minning_reward);
-                (pending_transaction).push_back(reward_transaction);
+                pending_transaction.insert(reward_transaction);
             }
             block_type new_block((chain.back().get_hash()), difficulty, pending_transaction, size());
             chain.push_back(new_block);
@@ -92,7 +93,7 @@ namespace ra
                 std::cout << "Invalid Transaction";
                 exit(0);
             }
-            (pending_transaction).push_back(temp);
+            pending_transaction.insert(temp);
         }
 
         // Iterated through all block which iterated though all transactions
