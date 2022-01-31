@@ -7,7 +7,7 @@
 namespace ra
 {
 
-    template <class Transaction, class HashFunction>
+    template <class Transaction, class HashFunctionClass>
     class block
     {
     private:
@@ -19,7 +19,7 @@ namespace ra
         std::chrono::steady_clock::time_point timestamp;
 
         // template input as here std::hash is used but u can make sha256 and the inetegrate them
-        HashFunction hash_function;
+        HashFunctionClass hash_function;
 
         // random data
         int nonce;
@@ -111,7 +111,7 @@ namespace ra
         }
 
         // modifiable.
-        friend std::ostream &operator<<(std::ostream &out, block<Transaction, HashFunction> const &temp)
+        friend std::ostream &operator<<(std::ostream &out, block<Transaction, HashFunctionClass> const &temp)
         {
             int i = 1;
             if (temp.id == 0)

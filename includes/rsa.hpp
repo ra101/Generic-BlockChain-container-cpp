@@ -21,8 +21,8 @@ namespace ra
     public:
         rsa_key_pair();
         rsa_key_pair(std::string);
-        std::size_t decript(unsigned);
-        std::size_t decript_with_padding(std::string);
+        std::size_t decrypt(unsigned);
+        std::size_t decrypt_with_padding(std::string);
         unsigned long long int get_public_key();
         unsigned long long int get_private_key();
         template <typename Message>
@@ -30,8 +30,8 @@ namespace ra
     };
     // below function are nor the part of class neither friend function
     std::string padding(std::string);
-    std::size_t encript(std::size_t, unsigned long long int);
-    std::string encript_with_padding(std::size_t, unsigned long long int);
+    std::size_t encrypt(std::size_t, unsigned long long int);
+    std::string encrypt_with_padding(std::size_t, unsigned long long int);
     template <typename Message>
     bool verify(Message, std::size_t, unsigned long long int);
 
@@ -100,7 +100,7 @@ namespace ra
         return private_key;
     }
 
-    std::size_t encript(std::size_t digest, unsigned long long int others_public_key)
+    std::size_t encrypt(std::size_t digest, unsigned long long int others_public_key)
     {
         int n = others_public_key / BIG_NO; // retrive n
         int e = others_public_key % BIG_NO; // retrive e
@@ -120,14 +120,14 @@ namespace ra
         return res;
     }
 
-    std::size_t rsa_key_pair::decript(unsigned encripted_data)
+    std::size_t rsa_key_pair::decrypt(unsigned encrypted_data)
     {
         int n = private_key / BIG_NO; // retrive n
         int d = private_key % BIG_NO; // retrive d
         unsigned long long int res = 1;
-        unsigned long long int x = encripted_data;
+        unsigned long long int x = encrypted_data;
         x = x % n;
-        while (d > 0) // exact simmilar encript
+        while (d > 0) // exact simmilar encrypt
         {
             if (d & 1)
                 res = (res * x) % n;
@@ -146,40 +146,40 @@ namespace ra
         return output_no;
     }
 
-    std::string encript_with_padding(std::size_t digest, unsigned long long int others_public_key)
+    std::string encrypt_with_padding(std::size_t digest, unsigned long long int others_public_key)
     {
         std::string output;
         while (digest != 0)
         {
-            // encript one digit at a time and pad it
-            output = padding(std::to_string(encript((digest % 10), others_public_key))) + output;
+            // encrypt one digit at a time and pad it
+            output = padding(std::to_string(encrypt((digest % 10), others_public_key))) + output;
             digest /= 10;
         }
         return output;
     }
 
-    std::size_t rsa_key_pair::decript_with_padding(std::string encripted_data)
+    std::size_t rsa_key_pair::decrypt_with_padding(std::string encrypted_data)
     {
         int digit = 0;
         std::size_t res = 0;
-        int i, n = encripted_data.length();
+        int i, n = encrypted_data.length();
         for (i = 0; i < n; digit = 0)
         {
-            while (i < n - 1 && encripted_data.at(i) == '0') // let all zeros pass and n-1 'cuz of i+=1
+            while (i < n - 1 && encrypted_data.at(i) == '0') // let all zeros pass and n-1 'cuz of i+=1
             {
                 i += 1;
                 if (i % PAD_SIZE == 0)
                 {
-                    // if we pass a PAD_SIZEgth of '0's (encription of zero is zero)
+                    // if we pass a PAD_SIZEgth of '0's (encryption of zero is zero)
                     res = res * 10;
                 }
             }
             while (i % PAD_SIZE != 0) // change loop after each PAD_SIZEgth
             {
-                digit = digit * 10 + (encripted_data.at(i) - '0'); // create digit
+                digit = digit * 10 + (encrypted_data.at(i) - '0'); // create digit
                 i += 1;
             }
-            res = res * 10 + decript(digit);
+            res = res * 10 + decrypt(digit);
         }
         return res;
     }
@@ -188,8 +188,8 @@ namespace ra
     std::size_t rsa_key_pair::sign(Message message)
     {
         std::hash<Message> hash_function;
-        unsigned short int hash_output = hash_function(message); // short int 'cuz of sizeLimit(x*x) of decription
-        return (decript(hash_output));                           // signing is nothing but decript of hashed msg
+        unsigned short int hash_output = hash_function(message); // short int 'cuz of sizeLimit(x*x) of decryption
+        return (decrypt(hash_output));                           // signing is nothing but decrypt of hashed msg
     }
 
     template <typename Message>
@@ -197,7 +197,7 @@ namespace ra
     {
         std::hash<Message> hash_function;
         short int hash_output = hash_function(message);
-        short int res = encript(digest, others_public_key);
+        short int res = encrypt(digest, others_public_key);
         return (res == hash_output);
     }
 }

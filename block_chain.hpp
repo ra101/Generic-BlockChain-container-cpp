@@ -12,10 +12,13 @@ namespace ra
     class block_chain
     {
     private:
-        std::list<ra::block<Transaction, HashFunctionClass>> chain;
+        using block_type = block<Transaction, HashFunctionClass>;
+
+        std::list<block_type> chain;
+        std::list<Transaction> pending_transaction;
+
         int difficulty;
         float minning_reward;
-        std::list<Transaction> pending_transaction;
 
         // It exists for a non reward based block_chain
         bool reward_flag;
@@ -29,25 +32,25 @@ namespace ra
             this->difficulty = difficulty;
             this->minning_reward = minning_reward;
             this->verfication_function = verfication_function;
-            chain.push_back(*(new block<Transaction, HashFunctionClass>(0, difficulty, pending_transaction, chain.size())));
+            chain.push_back(*(new block_type(0, difficulty, pending_transaction, size())));
             reward_flag = true;
         }
 
         block_chain(int difficulty)
         {
             this->difficulty = difficulty;
-            chain.push_back(*(new block<Transaction, HashFunctionClass>(0, difficulty, pending_transaction, chain.size())));
+            chain.push_back(*(new block_type(0, difficulty, pending_transaction, size())));
             reward_flag = false;
         }
         bool is_chain_valid()
         {
-            for (typename std::list<block<Transaction, HashFunctionClass>>::iterator previous_block, current_block = chain.begin(); current_block != chain.end(); ++current_block)
+            for (iterator previous_block, current_block = begin(); current_block != end(); ++current_block)
             {
                 if (!(*current_block).is_hash_valid())
                     return false;
 
                 // Connection of chains are valid?
-                if (current_block != chain.begin())
+                if (current_block != begin())
                     if ((*current_block).get_previous_hash() != (*previous_block).get_hash())
                         return false;
 
@@ -67,14 +70,14 @@ namespace ra
                 Transaction reward_transaction(0, minning_reward_address, minning_reward);
                 (pending_transaction).push_back(reward_transaction);
             }
-            block<Transaction, HashFunctionClass> new_block((chain.back().get_hash()), difficulty, pending_transaction, chain.size());
+            block_type new_block((chain.back().get_hash()), difficulty, pending_transaction, size());
             chain.push_back(new_block);
             pending_transaction.clear();
         }
 
         void mine_pending_transactions()
         {
-            block<Transaction, HashFunctionClass> new_block((chain.back().get_hash()), difficulty, pending_transaction, chain.size());
+            block_type new_block((chain.back().get_hash()), difficulty, pending_transaction, size());
             chain.push_back(new_block);
 
             // Now liist is reset to null
@@ -96,7 +99,7 @@ namespace ra
         float get_balance(const unsigned long long int address)
         {
             float balance = 0;
-            for (typename std::list<block<Transaction, HashFunctionClass>>::iterator current_block = chain.begin(); current_block != chain.end(); ++current_block)
+            for (iterator current_block = begin(); current_block != end(); ++current_block)
                 balance += (*current_block).get_balance(address);
 
             return balance;
@@ -108,39 +111,45 @@ namespace ra
         {
         private:
             // List iterator
-            typename std::_List_iterator<ra::block<Transaction, HashFunctionClass>> block_ptr;
+            using pointer_type = std::_List_iterator<block_type>;
+            pointer_type m_block_ptr;
 
         public:
             iterator() {}
-            iterator(std::_List_iterator<ra::block<Transaction, HashFunctionClass>> block_ptr)
-            {
-                this->block_ptr = block_ptr;
-            }
-            void set(std::_List_iterator<ra::block<Transaction, HashFunctionClass>> block_ptr)
-            {
-                this->block_ptr = block_ptr;
-            }
+            iterator(pointer_type m_block_ptr) { this->m_block_ptr = m_block_ptr; }
+            void set(pointer_type m_block_ptr) { this->m_block_ptr = m_block_ptr; }
+            bool operator==(const iterator &other) { return m_block_ptr == other.m_block_ptr; }
+            bool operator!=(const iterator &other) { return m_block_ptr != other.m_block_ptr; }
+            block_type &operator*() { return *m_block_ptr; }
+            const iterator *operator->() { return m_block_ptr; }
 
             iterator operator=(const iterator &other)
             {
-                block_ptr = other.block_ptr;
+                m_block_ptr = other.m_block_ptr;
                 return *this;
             }
-            bool operator==(const iterator &other) { return (block_ptr == other.block_ptr); }
-            bool operator!=(const iterator &other) { return (block_ptr != other.block_ptr); }
-            block<Transaction, HashFunctionClass> &operator*() { return *(block_ptr); }
             iterator operator++(int)
             {
-                iterator i = *this;
-                block_ptr++;
-                return i;
+                iterator _temp = *this;
+                m_block_ptr++;
+                return _temp;
             }
             iterator &operator++()
             {
-                block_ptr++;
+                m_block_ptr++;
                 return *this;
             }
-            const iterator *operator->() { return (block_ptr); }
+            iterator operator--(int)
+            {
+                iterator _temp = *this;
+                m_block_ptr--;
+                return _temp;
+            }
+            iterator &operator--()
+            {
+                m_block_ptr--;
+                return *this;
+            }
         };
 
         const iterator begin()
@@ -148,24 +157,13 @@ namespace ra
             iterator other(chain.begin());
             return other;
         }
-
         const iterator end()
         {
             iterator other(chain.end());
             return other;
         }
-
-        block<Transaction, HashFunctionClass> &back()
-        {
-            return chain.back();
-        }
-        block<Transaction, HashFunctionClass> &front()
-        {
-            return chain.front();
-        }
-        int size()
-        {
-            return chain.size();
-        }
+        block_type &back() { return chain.back(); }
+        block_type &front() { return chain.front(); }
+        int size() { return chain.size(); }
     };
 }
