@@ -75,15 +75,8 @@ namespace ra
             }
             return hash_output;
         }
-        std::size_t get_hash()
-        {
-            return hash;
-        }
-
-        std::size_t get_previous_hash()
-        {
-            return previous_hash;
-        }
+        std::size_t get_hash() { return hash; }
+        std::size_t get_previous_hash() { return previous_hash; }
 
         // recalculates hash and matches to current hash
         bool is_hash_valid()

@@ -92,9 +92,9 @@ int main()
   ra::rsa_key_pair k2("189.0.2.47:52");
 
   ra::block_chain<custom_transaction, std::hash<std::string>, std::string> ra_coin(MED_DIFFICULTY, 50, ra::verify);
-  // ra::block_chain<ra::Transaction, std::hash<std::string>> ra_coin(MAX_DIFFICULTY);
+  // ra::block_chain<custom_transaction, std::hash<std::string>> ra_coin(MAX_DIFFICULTY);
 
-  custom_transaction t1(k1.get_public_key(), k2.get_public_key(), 50);
+  custom_transaction t1(k1.get_public_key(), k2.get_public_key(), 1000);
   t1.sign_transaction<ra::rsa_key_pair>(k1);
   ra_coin.add_transaction(t1);
 

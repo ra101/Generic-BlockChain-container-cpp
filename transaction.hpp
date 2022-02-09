@@ -1,19 +1,42 @@
 #include <iostream>
 #include <chrono>
 
+#include "exceptions.hpp"
+
 namespace ra
 {
     class base_transaction
     {
     public:
-        std::string generate_hash_input() const;                                   // converts to string and concatenates them
-        friend std::ostream &operator<<(std::ostream &, base_transaction const &); // to print transacttion
-        bool operator<(const base_transaction &other) const;
-        float get_balance(const unsigned long long int) const;
-        template <typename EncryptionAlgo>              // makes sense for multiple transactions
-        bool sign_transaction(EncryptionAlgo key_pair); // hash of input happen during signing
+        base_transaction(){};
+        base_transaction(const unsigned long long int, const unsigned long long int, const float &) { throw not_implemented_exception(); }
+        // converts to string and concatenates them
+        std::string generate_hash_input() const { throw not_implemented_exception(); }
+        // to print transacttion
 
-        template <typename Message>                                                              // makes sense for multiple transactions
-        bool is_transaction_valid(bool (*)(Message, std::size_t, unsigned long long int)) const; // uses verify of rsa
+        friend std::ostream &operator<<(std::ostream &, base_transaction const &)
+        {
+            throw not_implemented_exception();
+        }
+
+        // used for comparision within a set
+        bool operator<(const base_transaction &other) const { throw not_implemented_exception(); }
+
+        // makes sense for multiple transactions
+        float get_balance(const unsigned long long int) const { throw not_implemented_exception(); }
+
+        // hash of input happen during signing
+        template <typename EncryptionAlgo>
+        bool sign_transaction(EncryptionAlgo key_pair)
+        {
+            throw not_implemented_exception();
+        }
+
+        // uses verify of rsa
+        template <typename Message>
+        bool is_transaction_valid(bool (*)(Message, std::size_t, unsigned long long int)) const
+        {
+            throw not_implemented_exception();
+        }
     };
 }

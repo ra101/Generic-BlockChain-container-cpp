@@ -1,7 +1,7 @@
 CXX=g++
 CXXFLAGS=-std=c++11 -w
 
-build: main.cpp block_chain.hpp block.hpp transaction.hpp includes/rsa.hpp includes/prime.hpp
+build: main.cpp block_chain.hpp block.hpp transaction.hpp includes/rsa.hpp includes/prime.hpp exceptions.hpp
 	@echo "\n\nBuilding..."
 	$(CXX) $(CXXFLAGS) -o block_chain.out main.cpp
 
