@@ -9,7 +9,7 @@ namespace ra
 {
 
     // HashFunctionClass has no funtionality in this header, but it has to be passed into block constructor
-    template <class Transaction, class HashFunctionClass, typename Message>
+    template <class Transaction, class HashFunctionClass>
     class block_chain
     {
     private:
@@ -25,10 +25,10 @@ namespace ra
         bool reward_flag;
 
         // Transaction will use this verfication function
-        bool (*verfication_function)(Message, std::size_t, unsigned long long int);
+        bool (*verfication_function)(std::string, std::size_t, unsigned long long int);
 
     public:
-        block_chain(int difficulty, float minning_reward, bool (*verfication_function)(Message, std::size_t, unsigned long long int))
+        block_chain(int difficulty, float minning_reward, bool (*verfication_function)(std::string, std::size_t, unsigned long long int))
         {
             this->difficulty = difficulty;
             this->minning_reward = minning_reward;

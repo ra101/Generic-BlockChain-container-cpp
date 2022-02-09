@@ -33,8 +33,7 @@ namespace ra
         }
 
         // uses verify of rsa
-        template <typename Message>
-        bool is_transaction_valid(bool (*)(Message, std::size_t, unsigned long long int)) const
+        bool is_transaction_valid(bool (*)(std::string, std::size_t, unsigned long long int)) const
         {
             throw not_implemented_exception();
         }

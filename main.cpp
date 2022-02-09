@@ -71,8 +71,7 @@ public:
     return true;
   }
 
-  template <typename Message> // makes sense for multiple transactions
-  bool is_transaction_valid(bool (*verfication_function)(Message, std::size_t, unsigned long long int)) const
+  bool is_transaction_valid(bool (*verfication_function)(std::string, std::size_t, unsigned long long int)) const
   {
     // reward
     if (from_address == 0)
@@ -91,7 +90,7 @@ int main()
   ra::rsa_key_pair k1("127.0.0.1:80");
   ra::rsa_key_pair k2("189.0.2.47:52");
 
-  ra::block_chain<custom_transaction, std::hash<std::string>, std::string> ra_coin(MED_DIFFICULTY, 50, ra::verify);
+  ra::block_chain<custom_transaction, std::hash<std::string>> ra_coin(MED_DIFFICULTY, 50, ra::verify);
   // ra::block_chain<custom_transaction, std::hash<std::string>> ra_coin(MAX_DIFFICULTY);
 
   custom_transaction t1(k1.get_public_key(), k2.get_public_key(), 1000);
@@ -100,7 +99,7 @@ int main()
 
   ra_coin.mine_pending_transactions(k2.get_public_key());
 
-  for (ra::block_chain<custom_transaction, std::hash<std::string>, std::string>::iterator abc = ra_coin.begin(); abc != ra_coin.end(); abc++)
+  for (ra::block_chain<custom_transaction, std::hash<std::string>>::iterator abc = ra_coin.begin(); abc != ra_coin.end(); abc++)
   {
     std::cout << *abc;
   }

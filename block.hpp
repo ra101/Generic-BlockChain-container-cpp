@@ -86,8 +86,7 @@ namespace ra
             return (hash == hash_function(hash_input));
         }
 
-        template <typename Message>
-        bool is_block_valid(bool (*verfication_function)(Message, std::size_t, unsigned long long int))
+        bool is_block_valid(bool (*verfication_function)(std::string, std::size_t, unsigned long long int))
         {
 
             for (typename std::set<Transaction>::iterator trans_elem = transaction_set.begin(); trans_elem != transaction_set.end(); trans_elem++)
