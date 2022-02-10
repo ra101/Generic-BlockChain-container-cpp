@@ -3,6 +3,7 @@
 #include <set>
 
 #include "block.hpp"
+#include "exceptions.hpp"
 // Each class is independed of other there exits no herachy yet data can't be manipulated due to checks
 
 namespace ra
@@ -90,8 +91,7 @@ namespace ra
             // Signed?
             if (!temp.is_transaction_valid(verfication_function))
             {
-                std::cout << "Invalid Transaction";
-                exit(0);
+                throw invalid_transaction_error(temp);
             }
             pending_transaction.insert(temp);
         }

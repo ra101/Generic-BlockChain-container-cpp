@@ -1,7 +1,10 @@
 #include <iostream>
+#include <sstream>
+#include <chrono>
 
 #include "block_chain.hpp"
 #include "transaction.hpp"
+#include "exceptions.hpp"
 
 #include "includes/rsa.hpp"
 
@@ -34,13 +37,20 @@ public:
   {
     return generate_hash_input() < other.generate_hash_input();
   }
+  operator std::string() const
+  {
+
+    std::string from_address_str = "\nfrom_address: " + std::to_string(from_address);
+    std::string to_address_str = "\nto_address: " + std::to_string(to_address);
+    std::string transfer_amount_str = "\ntransfer_amount: " + std::to_string(transfer_amount);
+    std::string signature_str = "\nsignature: " + std::to_string(signature);
+
+    return from_address_str + to_address_str + transfer_amount_str + signature_str;
+  }
+
   friend std::ostream &operator<<(std::ostream &out, custom_transaction const &temp)
   {
-    out << "\nfrom_address: " << temp.from_address;
-    out << "\nto_address: " << temp.to_address;
-    out << "\ntransfer_amount: " << temp.transfer_amount;
-    out << "\nsignature: " << temp.signature;
-    return out;
+    return out << std::string(temp);
   }
 
   float get_balance(unsigned long long int address) const
@@ -59,13 +69,12 @@ public:
   {
     if (from_address != key_pair.get_public_key())
     {
-      std::cout << "address and key donot match";
-      exit(0);
+      throw ra::public_key_mismatch(std::to_string(from_address), std::to_string(key_pair.get_public_key()));
     }
 
     // already signed
     if (signature != 0)
-      return false;
+      throw ra::resign_transaction_exception(*this);
 
     signature = key_pair.sign(generate_hash_input());
     return true;
@@ -90,11 +99,19 @@ int main()
   ra::rsa_key_pair k1("127.0.0.1:80");
   ra::rsa_key_pair k2("189.0.2.47:52");
 
-  ra::block_chain<custom_transaction, std::hash<std::string>> ra_coin(MED_DIFFICULTY, 50, ra::verify);
-  // ra::block_chain<custom_transaction, std::hash<std::string>> ra_coin(MAX_DIFFICULTY);
+  ra::block_chain<custom_transaction, std::hash<std::string>> ra_coin(MIN_DIFFICULTY, 50, ra::verify);
+  // ra::block_chain<custom_transaction, std::hash<std::string>> ra_coin(MAX_DIFFICULTY, ra::verify);
 
   custom_transaction t1(k1.get_public_key(), k2.get_public_key(), 1000);
+
+  /*
+    Update the line below in the following manner to get the following exceptions
+    comment it -> Invalid Transaction Error
+    duplicate it -> Resign Exception
+    replace k1 with k2 -> Mismatch
+  */
   t1.sign_transaction<ra::rsa_key_pair>(k1);
+
   ra_coin.add_transaction(t1);
 
   ra_coin.mine_pending_transactions(k2.get_public_key());
@@ -106,5 +123,6 @@ int main()
   std::cout << "\n\nIs Chain Valid: " << ra_coin.is_chain_valid();
 
   std::cout << "\n\nk2 balance : " << ra_coin.get_balance(k2.get_public_key());
+  std::cout << "\nk1 balance : " << ra_coin.get_balance(k1.get_public_key());
   return 0;
 }

@@ -1,5 +1,4 @@
 #include <iostream>
-#include <chrono>
 
 #include "exceptions.hpp"
 
@@ -9,11 +8,17 @@ namespace ra
     {
     public:
         base_transaction(){};
+
+        // from_address, to_address, transfer_amount
         base_transaction(const unsigned long long int, const unsigned long long int, const float &) { throw not_implemented_exception(); }
+
         // converts to string and concatenates them
         std::string generate_hash_input() const { throw not_implemented_exception(); }
-        // to print transacttion
 
+        // to print transacttion
+        operator std::string() const { throw not_implemented_exception(); }
+
+        // to print transacttion
         friend std::ostream &operator<<(std::ostream &, base_transaction const &)
         {
             throw not_implemented_exception();
