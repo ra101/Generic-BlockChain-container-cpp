@@ -86,10 +86,6 @@ public:
     if (from_address == 0)
       return true;
 
-    // unsigned and not reward
-    if (signature == 0)
-      return false;
-
     return verfication_function(generate_hash_input(), signature, from_address);
   }
 };
@@ -99,7 +95,7 @@ int main()
   ra::rsa_key_pair k1("127.0.0.1:80");
   ra::rsa_key_pair k2("189.0.2.47:52");
 
-  ra::block_chain<custom_transaction, std::hash<std::string>> ra_coin(MIN_DIFFICULTY, 50, ra::verify);
+  ra::block_chain<custom_transaction, std::hash<std::string>> ra_coin(MED_DIFFICULTY, ra::verify, 50);
   // ra::block_chain<custom_transaction, std::hash<std::string>> ra_coin(MAX_DIFFICULTY, ra::verify);
 
   custom_transaction t1(k1.get_public_key(), k2.get_public_key(), 1000);
@@ -114,7 +110,7 @@ int main()
 
   ra_coin.add_transaction(t1);
 
-  ra_coin.mine_pending_transactions(k2.get_public_key());
+  ra_coin.mine_pending_transactions(k1.get_public_key());
 
   for (ra::block_chain<custom_transaction, std::hash<std::string>>::iterator abc = ra_coin.begin(); abc != ra_coin.end(); abc++)
   {

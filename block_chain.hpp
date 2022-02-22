@@ -20,30 +20,22 @@ namespace ra
         std::set<Transaction> pending_transaction;
 
         int difficulty;
-        float minning_reward;
 
-        // It exists for a non reward based block_chain
-        bool reward_flag;
+        // If exists, will add a new trasaction from admin before mining block
+        float minning_reward;
 
         // Transaction will use this verfication function
         bool (*verfication_function)(std::string, std::size_t, unsigned long long int);
 
     public:
-        block_chain(int difficulty, float minning_reward, bool (*verfication_function)(std::string, std::size_t, unsigned long long int))
+        block_chain(int difficulty, bool (*verfication_function)(std::string, std::size_t, unsigned long long int), float minning_reward = 0)
         {
             this->difficulty = difficulty;
             this->minning_reward = minning_reward;
             this->verfication_function = verfication_function;
             chain.push_back(*(new block_type(0, difficulty, pending_transaction, size())));
-            reward_flag = true;
         }
 
-        block_chain(int difficulty)
-        {
-            this->difficulty = difficulty;
-            chain.push_back(*(new block_type(0, difficulty, pending_transaction, size())));
-            reward_flag = false;
-        }
         bool is_chain_valid()
         {
             for (iterator previous_block, current_block = begin(); current_block != end(); ++current_block)
@@ -65,24 +57,16 @@ namespace ra
             return true;
         }
 
-        void mine_pending_transactions(unsigned long long int minning_reward_address)
+        void mine_pending_transactions(unsigned long long int minning_reward_address = 0)
         {
-            if (reward_flag)
+            if (minning_reward)
             {
                 Transaction reward_transaction(0, minning_reward_address, minning_reward);
-                pending_transaction.insert(reward_transaction);
+                add_transaction(reward_transaction);
             }
+
             block_type new_block((chain.back().get_hash()), difficulty, pending_transaction, size());
             chain.push_back(new_block);
-            pending_transaction.clear();
-        }
-
-        void mine_pending_transactions()
-        {
-            block_type new_block((chain.back().get_hash()), difficulty, pending_transaction, size());
-            chain.push_back(new_block);
-
-            // Now liist is reset to null
             pending_transaction.clear();
         }
 
@@ -153,16 +137,8 @@ namespace ra
             }
         };
 
-        const iterator begin()
-        {
-            iterator other(chain.begin());
-            return other;
-        }
-        const iterator end()
-        {
-            iterator other(chain.end());
-            return other;
-        }
+        const iterator begin() { return chain.begin(); }
+        const iterator end() { return chain.end(); }
         block_type &back() { return chain.back(); }
         block_type &front() { return chain.front(); }
         int size() { return chain.size(); }

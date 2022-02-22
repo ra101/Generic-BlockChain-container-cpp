@@ -3,7 +3,7 @@
 #include <set>
 
 #define MIN_DIFFICULTY 1
-#define MED_DIFFICULTY 3
+#define MED_DIFFICULTY 2
 #define MAX_DIFFICULTY 3
 
 namespace ra
